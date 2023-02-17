@@ -1,0 +1,10 @@
+---
+# tasks file for configure php
+
+- name: Configure php | Sync settings for php and create links
+  become: true
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+  - rsync -av debian/php.d/ /etc/php/8.0/mods-available/
+  - ln -sf /etc/php/8.0/mods-available/zbx-bitrix.ini  /etc/php/8.0/apache2/conf.d/99-bitrix.ini
+  - ln -sf /etc/php/8.0/mods-available/zbx-bitrix.ini  /etc/php/8.0/cli/conf.d/99-bitrix.ini 

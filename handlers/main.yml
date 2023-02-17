@@ -1,0 +1,11 @@
+---
+# handlers file for bitrix24-role
+
+- name: Reboot host
+  become: true
+  ansible.builtin.reboot:
+
+- name: Daemon reload
+  become: true
+  ansible.builtin.systemd: 
+    daemon_reload: yes

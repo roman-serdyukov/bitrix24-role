@@ -1,0 +1,43 @@
+---
+# tasks file for install bitrix24 in CentOS 
+
+- name: Install for centos | Update apt cache
+  become: true
+  ansible.builtin.yum: 
+    update_cache: yes 
+#   cache_valid_time: 3600
+  ignore_errors: true
+
+- name: Install for centos | Download bitrix24 install file
+  ansible.builtin.get_url:
+    url: " {{ bitrix_env_url }}"
+    dest: "{{ dest_folder }}"
+    mode: '0755'
+
+- name: Install for centos | Disable SElinux
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+    create: yes
+  notify: Reboot host
+
+- name: Install for centos | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Install for centos | Wait for the machine to come back online
+  ansible.builtin.wait_for_connection:
+    connect_timeout: 60
+    sleep: 5
+    delay: 5
+    timeout: 300 
+
+- name: Install for centos | Start install file
+  become: true
+  ansible.builtin.command: ./{{ dist_file }} -s -p -H '{{ server_name }}' -F -m '{{ mysql_ver }}' -M "{{ mysql_root_password }}"
+  register: result_install_bitrix
+
+- name: Install for centos | Show result install
+  debug:
+    var: result_install_bitrix

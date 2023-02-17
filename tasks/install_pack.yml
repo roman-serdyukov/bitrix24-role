@@ -1,0 +1,30 @@
+---
+# Tasks file for install all packages
+
+- name: Other packages | Update apt cache
+  become: true
+  ansible.builtin.apt: 
+    update_cache: yes 
+    cache_valid_time: 3600
+  ignore_errors: true
+  
+- name: Other packages | Installing the required packages
+  become: True
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - '{{ other_pack }}'
+
+- name: Other packages | Adding a repository for php
+  become: true
+  ansible.builtin.apt_repository:
+    repo: '{{ php_repo }}'
+
+- name: Other packages | Installing the required packages
+  become: True
+  ansible.builtin.apt:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - '{{ php_pack }}'

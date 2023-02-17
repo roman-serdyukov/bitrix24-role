@@ -1,0 +1,157 @@
+---
+# Tasks file for configure push-server
+
+- name: Configure push-server | Download push-server
+  become: true
+  ansible.builtin.get_url:
+    url: " {{ pushserver_url }}"
+    dest: /opt
+
+- name: Configure push-server | Install push-server
+  become: true
+  ansible.builtin.command: npm install --production ./push-server-0.3.0.tgz
+  args:
+    chdir: /opt
+  register: install_results
+
+- name: Configure push-server | Show log install push-server
+  debug:
+    var: install_results
+
+- name: Configure push-server | Create a symbolic link /etc/push-server
+  become: true
+  ansible.builtin.file:
+    src: /opt/node_modules/push-server/etc/push-server
+    dest: /etc/push-server
+    state: link
+
+- name: Configure push-server | Copy init.d/push-server-multi
+  become: true
+  ansible.builtin.copy:
+    src: /opt/node_modules/push-server/etc/init.d/push-server-multi
+    dest: /usr/local/bin/push-server-multi
+    remote_src: yes
+    mode: '0755'
+
+- name: Configure push-server | Create a directory /etc/sysconfig
+  become: true
+  ansible.builtin.file:
+    path: /etc/sysconfig
+    state: directory
+
+- name: Configure push-server | Copy sysconfig/push-server-multi
+  become: true
+  ansible.builtin.copy:
+    src: /opt/node_modules/push-server/etc/sysconfig/push-server-multi
+    dest: /etc/sysconfig/push-server-multi
+    remote_src: yes
+
+- name: Configure push-server | Copy push-server/push-server.service
+  become: true
+  ansible.builtin.copy:
+    src: /opt/node_modules/push-server/etc/push-server/push-server.service
+    dest: /etc/systemd/system/
+    remote_src: yes
+
+- name: Configure push-server | Create a symbolic link /opt/push-server
+  become: true
+  ansible.builtin.file:
+    src: /opt/node_modules/push-server
+    dest: /opt/push-server
+    state: link
+
+- name: Configure push-server | Change in push-server-multi
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/push-server-multi
+    line: "{{ item }}"
+    create: yes
+  with_items: 
+  - GROUP=www-data
+  - SECURITY_KEY="{{ security_key }}"
+  - RUN_DIR=/tmp/push-server
+  - REDIS_SOCK=/var/run/redis/redis.sock
+
+- name: Configure push-server | Add the user 'bitrix'
+  become: true
+  ansible.builtin.user:
+    name: bitrix
+    groups: www-data
+
+- name: Configure push-server | Create a directory /etc/rc.d
+  become: true
+  ansible.builtin.file:
+    path: /etc/rc.d
+    state: directory
+
+- name: Configure push-server | Create a directory /etc/rc.d/init.d
+  become: true
+  ansible.builtin.file:
+    path: /etc/rc.d/init.d
+    state: directory
+    
+- name: Configure push-server | Create a symbolic link /opt/push-server
+  become: true
+  ansible.builtin.file:
+    src: /lib/lsb/init-functions
+    dest: /etc/rc.d/init.d/functions
+    state: link
+
+- name: Configure push-server | Generate congig files for push-server-multi
+  become: true
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+  - /usr/local/bin/push-server-multi configs pub
+  - /usr/local/bin/push-server-multi configs sub
+
+- name: Configure push-server | Change in /etc/tmpfiles.d/push-server.conf
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/tmpfiles.d/push-server.conf
+    line: 'd /tmp/push-server 0770 bitrix www-data -'
+    create: yes
+
+- name: Configure push-server | Working with temp files
+  become: true
+  ansible.builtin.command: systemd-tmpfiles --remove --create
+
+- name: Configure push-server | Change file ownership and group
+  become: true
+  ansible.builtin.file:
+    path: /var/log/push-server
+    owner: bitrix
+    group: www-data
+
+- name: Configure push-server | Change group in 'push-server.service'
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/push-server.service
+    regexp: '^Group'
+    line: 'Group=www-data'
+    backup: yes
+
+- name: Configure push-server | Change ExecStart in 'push-server.service'
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/push-server.service
+    regexp: '^ExecStart'
+    line: 'ExecStart=/usr/local/bin/push-server-multi systemd_start'
+    backup: yes
+
+- name: Configure push-server | Change ExecStop in 'push-server.service'
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/system/push-server.service
+    regexp: '^ExecStop'
+    line: 'ExecStop=/usr/local/bin/push-server-multi stop'
+    backup: yes
+  notify: Daemon reload
+
+- name: Configure push-server | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Configure push-server | Enable push-server
+  become: true
+  ansible.builtin.systemd:
+    name: push-server
+    enabled: yes

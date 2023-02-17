@@ -1,0 +1,31 @@
+---
+# tasks file for configure nginx
+
+- name: Configure nginx | Sync settings for nginx
+  become: true
+  ansible.builtin.command: rsync -av debian/nginx/ /etc/nginx/
+
+- name: Configure nginx | Adding an entry to hosts
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: 127.0.0.1 push httpd
+    create: yes
+
+- name: Configure nginx | Stop apache2
+  become: true
+  ansible.builtin.systemd:
+    name: apache2
+    state: stopped
+
+- name: Configure nginx | Start nginx
+  become: true
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: yes
+  register: nginx_start
+
+- name: Configure nginx | Show nginx log
+  debug:
+    var: '{{ nginx_start }}'

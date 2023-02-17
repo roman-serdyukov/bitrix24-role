@@ -1,0 +1,45 @@
+---
+# tasks file for bitrix24-role
+
+- name: Install Bitrix24 in locale Ru_ru
+  include_tasks: install_locale_ru.yml
+
+- name: Install Bitrix24 in centos7
+  include_tasks: install_for_centos7.yml
+  when: ansible_distribution == "CentOS"
+
+- name: Install Bitrix24 in ubuntu | Install packages
+  include_tasks: install_pack.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | preconfig
+  include_tasks: preconfig_pack.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Configure nginx
+  include_tasks: config_nginx.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Configure php
+  include_tasks: config_php.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Configure apache2
+  include_tasks: config_apache.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Configure mariadb
+  include_tasks: config_mariadb.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Configure redis
+  include_tasks: config_redis.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Configure push-server
+  include_tasks: config_push-server.yml
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Bitrix24 in ubuntu | Config site
+  include_tasks: config_site.yml
+  when: ansible_distribution == "Ubuntu"

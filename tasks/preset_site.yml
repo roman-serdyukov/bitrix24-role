@@ -1,0 +1,26 @@
+---
+# Tasks file for create preset site
+
+- name: Preset site | Create a directory /var/www/html/bx-site//bitrix
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/bx-site/bitrix
+    state: directory
+
+- name: Preset site | Create a directory /var/www/html/bx-site/bitrix/php_interface/
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/bx-site/bitrix/php_interface/
+    state: directory
+
+- name: Preset site | Copy settings.php
+  become: True
+  ansible.builtin.template:
+    src: templates/settings.j2
+    dest: /var/www/html/bx-site/bitrix/.settings.php
+
+- name: Preset site | Copy dbconn.php
+  become: True
+  ansible.builtin.template:
+    src: templates/dbconn.j2
+    dest: /var/www/html/bx-site/bitrix/php_interface/dbconn.php

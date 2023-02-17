@@ -1,0 +1,68 @@
+---
+# defaults file for bitrix24-role
+
+other_pack:
+ - lsb-release
+ - ca-certificates
+ - apt-transport-https
+ - software-properties-common
+ - gnupg2
+ - apache2
+ - nginx
+ - nodejs 
+ - npm
+ - redis
+ - software-properties-common
+ - unzip
+# - python3-pip
+ - mariadb-server
+ - mariadb-common
+ #- mysql-server
+ - python3-mysqldb
+
+#pip_pack:
+# - pymysql
+
+php_repo: ppa:ondrej/php
+
+php_pack:
+ - php8.0
+ - php8.0-cli
+ - php8.0-common
+ - php8.0-gd
+ - php8.0-ldap
+ - php8.0-mbstring
+ - php8.0-mysql 
+ - php8.0-opcache 
+ - php-pear 
+ - php8.0-apcu
+ - php-geoip 
+ - php8.0-mcrypt 
+ - php8.0-memcache
+ - php8.0-zip 
+ - php8.0-pspell 
+ - php8.0-xml
+
+#mysql_pack:
+# - mariadb-server
+# - mariadb-common
+
+settings_url: https://dev.1c-bitrix.ru/docs/chm_files/debian.zip
+
+dist_file: bitrix-env-crm.sh
+
+bitrix_env_url: https://repo.bitrix.info/yum/{{ dist_file }}
+
+dest_folder: /home/{{ ansible_user }}
+
+server_name: yc-bitrix01
+
+mysql_ver: 8.0
+
+pushserver_url: https://repo.bitrix.info/vm/push-server-0.3.0.tgz
+
+bitrixsetup_url: https://www.1c-bitrix.ru/download/scripts/bitrixsetup.php
+
+mysql_db: portal
+mysql_user: bitrix
+mysql_host: localhost

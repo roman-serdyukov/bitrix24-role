@@ -1,0 +1,46 @@
+---
+# Task file for install RU locale
+
+- name: Change lacale on RU | Ensure a locale exists for Ubuntu
+  become: true
+  ansible.builtin.locale_gen:
+    name: ru_RU.UTF-8
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: Change lacale on RU | Set default locale for Ubuntu
+  become: true
+  ansible.builtin.lineinfile:
+    dest: "/etc/default/locale"
+    regexp: "^LANG="
+    line: "LANG=ru_RU.UTF-8"
+  when: ansible_distribution == "Ubuntu"
+
+- name: Change lacale on RU | Reconfigure locales for Ubuntu
+  become: true
+  ansible.builtin.command: dpkg-reconfigure -f noninteractive locales
+  notify: Reboot host
+  when: ansible_distribution == "Ubuntu"
+
+- name: Change lacale on RU | Set locale ru_RU.UTF-8 on CentOS7
+  become: true
+  ansible.builtin.command: localectl set-locale LANG=ru_RU.UTF-8
+  notify: Reboot host
+  when: ansible_distribution == "CentOS"
+     
+- name: Change lacale on RU | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Change lacale on RU | Wait for the machine to come back online
+  wait_for_connection:
+      connect_timeout: 60
+      sleep: 5
+      delay: 5
+      timeout: 300 
+
+- name: Change lacale on RU | Check locale settings
+  ansible.builtin.command: locale
+  register: results_locale
+
+- debug:
+    var: results_locale

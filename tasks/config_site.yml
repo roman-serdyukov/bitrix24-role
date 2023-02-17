@@ -1,0 +1,42 @@
+---
+# Tasks file for configure site
+
+- name: Configure site | Create a directory /var/www/html/bx-site
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/bx-site
+    state: directory
+
+- name: Configure site | Download bitrixsetup
+  become: true
+  ansible.builtin.get_url:
+    url: " {{ bitrixsetup_url }}"
+    dest: /var/www/html/bx-site
+    mode: '0755'
+
+- name: Configure site | Preset site
+  include_tasks: preset_site.yml
+
+- name: Configure site | Change file ownership and group
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/bx-site
+    owner: www-data
+    group: www-data
+    recurse: yes
+
+- name: Configure site | Create mysaql db
+  become: true
+  community.mysql.mysql_db:
+    name: '{{ mysql_db }}'
+    master_data: 1
+    state: present
+
+- name: Configure site | Create mysql user
+  become: true
+  community.mysql.mysql_user:
+    name: '{{ mysql_user }}'
+    host: '%'
+    password: '{{ mysql_pass }}'
+    priv: '{{ mysql_db }}.*:ALL,GRANT'
+    state: present

@@ -1,0 +1,60 @@
+---
+# tasks file for configure mariadb
+
+- name: Configure mariadb | Sync settings for mariadb
+  become: true
+  ansible.builtin.command: rsync -av debian/mysql/ /etc/mysql/
+
+- name: Configure mariadb | Start mariadb
+  become: true
+  ansible.builtin.systemd:
+    name: mariadb
+    state: started
+    enabled: yes
+
+#- name: Configure mariadb | Enable remote login to mysql
+#  become: true
+#  lineinfile:
+#    path: /etc/mysql//mariadb.conf.d/50-server.cnf
+#    regexp: '^bind-address'
+#    line: 'bind-address = 0.0.0.0'
+#    backup: yes
+
+- name: Configure mariadb | Restart mariadb
+  become: true
+  ansible.builtin.systemd:
+    name: mariadb
+    state: restarted
+  
+- name: Configure mariadb | Register mariadb status
+  become: true
+  ansible.builtin.command: systemctl status mysql
+ 
+- name: Configure mariadb | Removes anonymous user account for localhost
+  become: true
+  community.mysql.mysql_user:
+    name: ''
+    host: "{{ item }}"
+    state: absent
+  with_items:
+    - localhost
+    - 127.0.0.1
+    - ::1
+    - "{{ansible_nodename}}"
+
+- name: Configure mariadb | Change root password
+  become: true
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    host: '%'
+    priv: '*.*:ALL,GRANT'
+
+- name: Configure mariadb | Delete Hostname based MySQL user
+  become: true
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+    name: root
+    host: "{{ansible_nodename}}"
+    state: absent

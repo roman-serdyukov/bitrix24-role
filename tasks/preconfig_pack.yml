@@ -1,0 +1,20 @@
+---
+# tasks file for download and unzip all configs
+
+- name: Preconfig packages | Download config files
+  ansible.builtin.get_url:
+    url: "{{ settings_url }}"
+    dest: "{{ dest_folder }}"
+
+- name: Preconfig packages | Find downloaded file
+  ansible.builtin.find:
+    paths: "{{ dest_folder }}"
+    patterns: '*.zip'
+  register: name_pack
+    
+- name: Preconfig packages | Extract downloaded zip
+  ansible.builtin.unarchive:
+    src: "{{ item.path }}"
+    dest: "{{ dest_folder }}"
+    remote_src: yes
+  with_items: "{{ name_pack.files }}"

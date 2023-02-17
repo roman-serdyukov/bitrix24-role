@@ -1,0 +1,47 @@
+---
+# Tasks file for configure redis
+
+- name: Configure redis | Congig redis
+  become: true
+  ansible.builtin.command: rsync -av debian/redis/redis.conf /etc/redis/redis.conf
+
+- name: Configure redis | Set primary group for user 'redis'
+  become: true
+  ansible.builtin.user:
+    name: bitrix
+    groups: www-data
+    append: true
+
+- name: Configure redis | Change file ownership and group
+  become: true
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: root
+    group: www-data
+  with_items:
+    - /etc/redis/
+    - /var/log/redis/
+
+- name: Configure redis | Change group for redis in file 'redis.service'
+  become: true
+  lineinfile:
+    path: /etc/systemd/system/redis.service
+    regexp: '^Group'
+    line: 'Group=www-data'
+    backup: yes
+  notify: Daemon reload
+
+- name: Configure redis | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Configure redis | Enable redis.service
+  become: true
+  ansible.builtin.systemd:
+    name: redis
+    enabled: yes
+
+- name: Configure redis | Restart redis
+  become: true
+  ansible.builtin.systemd:
+    name: redis
+    state: restarted

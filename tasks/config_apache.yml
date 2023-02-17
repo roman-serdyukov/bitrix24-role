@@ -1,0 +1,17 @@
+---
+# tasks file for configure apache2
+
+- name: Configure apache2 | Sync settings for apache2 and manage mods
+  become: true
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+  - rsync -av debian/apache2/ /etc/apache2/
+  - a2dismod --force autoindex
+  - a2enmod rewrite
+
+- name: Configure apache2 | Start apache2
+  become: true
+  ansible.builtin.systemd:
+    name: apache2
+    state: started
+    enabled: yes
