@@ -5,14 +5,16 @@
   become: true
   ansible.builtin.yum: 
     update_cache: yes 
-#   cache_valid_time: 3600
-  ignore_errors: true
+#  ignore_errors: true
 
 - name: Install for centos | Download bitrix24 install file
   ansible.builtin.get_url:
     url: " {{ bitrix_env_url }}"
     dest: "{{ dest_folder }}"
     mode: '0755'
+
+- name: Install for centos | Aditional partirion for bitrix
+  include_tasks: mount_part.yml
 
 - name: Install for centos | Disable SElinux
   become: true
@@ -31,7 +33,15 @@
     connect_timeout: 60
     sleep: 5
     delay: 5
-    timeout: 300 
+    timeout: 300
+
+- name: Install for centos | Register info about mount's
+  ansible.builtin.command: df -h
+  register: mount_info
+
+- name: Install for centos | View info about mount's
+  debug: 
+    var: mount_info.stdout_lines
 
 - name: Install for centos | Start install file
   become: true

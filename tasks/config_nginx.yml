@@ -11,6 +11,14 @@
     path: /etc/hosts
     line: 127.0.0.1 push httpd
     create: yes
+    
+- name: Configure nginx | Adding an entry to hosts
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/cloud/templates/hosts.debian.tmpl
+    line: 127.0.0.1 push httpd
+    create: yes
+  when: ansible_os_family == "Debian"
 
 - name: Configure nginx | Stop apache2
   become: true
@@ -28,4 +36,4 @@
 
 - name: Configure nginx | Show nginx log
   debug:
-    var: '{{ nginx_start }}'
+    var: nginx_start.stdout_lines

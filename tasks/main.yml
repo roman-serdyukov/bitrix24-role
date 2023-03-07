@@ -8,38 +8,38 @@
   include_tasks: install_for_centos7.yml
   when: ansible_distribution == "CentOS"
 
-- name: Install Bitrix24 in ubuntu | Install packages
+- name: Install Bitrix24 in Debian | Install packages
   include_tasks: install_pack.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | preconfig
+- name: Install Bitrix24 in Debian | preconfig
   include_tasks: preconfig_pack.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Configure nginx
+- name: Install Bitrix24 in Debian | Configure nginx
   include_tasks: config_nginx.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Configure php
+- name: Install Bitrix24 in Debian | Configure php
   include_tasks: config_php.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Configure apache2
+- name: Install Bitrix24 in Debian | Configure apache2
   include_tasks: config_apache.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Configure mariadb
+- name: Install Bitrix24 in Debian | Configure mariadb
   include_tasks: config_mariadb.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Configure redis
+- name: Install Bitrix24 in Debian | Configure redis
   include_tasks: config_redis.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Configure push-server
+- name: Install Bitrix24 in Debian | Configure push-server
   include_tasks: config_push-server.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"
 
-- name: Install Bitrix24 in ubuntu | Config site
+- name: Install Bitrix24 in Debian | Config site
   include_tasks: config_site.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_os_family == "Debian"

@@ -7,12 +7,25 @@
     path: /var/www/html/bx-site
     state: directory
 
+- name: Configure site | Aditional partirion for bitrix
+  include_tasks: mount_part.yml
+ 
+- name: Configure site | Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Configure site | Register info about mount's
+  ansible.builtin.command: df -h
+  register: mount_info
+
+- name: Configure site | View info about mount's
+  debug: 
+    var: mount_info.stdout_lines
+
 - name: Configure site | Download bitrixsetup
   become: true
   ansible.builtin.get_url:
     url: " {{ bitrixsetup_url }}"
     dest: /var/www/html/bx-site
-    mode: '0755'
 
 - name: Configure site | Preset site
   include_tasks: preset_site.yml

@@ -1,0 +1,30 @@
+- name: Mount aditional partirion | Create a new primary partition
+  become: true
+  community.general.parted:
+    device: /dev/vdb
+    number: 1
+    state: present
+    label: "gpt"
+  ignore_errors: true
+
+- name: Mount aditional partirion | Create filesystem on /dev/vdb1
+  become: true
+  community.general.filesystem:
+    fstype: "{{ second_fs }}"
+    dev: /dev/vdb1
+  ignore_errors: true
+  notify: 
+    - Create user bitrix for CentOS
+    - Mount for CentOS
+  when: ansible_distribution == "CentOS"
+
+- name: Mount aditional partirion | Create filesystem on /dev/vdb1
+  become: true
+  community.general.filesystem:
+    fstype: "{{ second_fs }}"
+    dev: /dev/vdb1
+  ignore_errors: true
+  notify: 
+    - Mount for Debian family
+    - Reboot host
+  when: ansible_os_family == "Debian"

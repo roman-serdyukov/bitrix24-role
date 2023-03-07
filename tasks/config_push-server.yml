@@ -16,7 +16,7 @@
 
 - name: Configure push-server | Show log install push-server
   debug:
-    var: install_results
+    var: install_results.stdout_lines
 
 - name: Configure push-server | Create a symbolic link /etc/push-server
   become: true

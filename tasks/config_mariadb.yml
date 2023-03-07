@@ -29,6 +29,11 @@
 - name: Configure mariadb | Register mariadb status
   become: true
   ansible.builtin.command: systemctl status mysql
+  register: mariadb_status
+
+- name: Configure mariadb | View mariadb status
+  debug:
+    var: mariadb_status.stdout_lines
  
 - name: Configure mariadb | Removes anonymous user account for localhost
   become: true

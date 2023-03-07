@@ -1,14 +1,14 @@
 ---
 # Tasks file for install all packages
 
-- name: Other packages | Update apt cache
+- name: Install packages | Update apt cache
   become: true
   ansible.builtin.apt: 
     update_cache: yes 
     cache_valid_time: 3600
   ignore_errors: true
   
-- name: Other packages | Installing the required packages
+- name: Install packages | Installing the required packages
   become: True
   ansible.builtin.apt:
     name: '{{ item }}'
@@ -16,12 +16,22 @@
   with_items:
     - '{{ other_pack }}'
 
-- name: Other packages | Adding a repository for php
+- name: Install packages | Adding a repository for php in Ubuntu
   become: true
   ansible.builtin.apt_repository:
     repo: '{{ php_repo }}'
+  when: ansible_distribution == "Ubuntu"
 
-- name: Other packages | Installing the required packages
+- name: Install packages | Adding a repository for php in Debian
+  become: true
+  ansible.builtin.shell: "{{ item }}"
+  with_items:
+    - echo "deb {{ php_url_debian }} $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/sury-php.list
+    - wget -qO - {{ php_url_debian }}/apt.gpg | apt-key add -
+    - apt update
+  when: ansible_distribution == "Debian"
+
+- name: Install packages | Installing the php packages
   become: True
   ansible.builtin.apt:
     name: '{{ item }}'

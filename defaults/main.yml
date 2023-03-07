@@ -14,16 +14,13 @@ other_pack:
  - redis
  - software-properties-common
  - unzip
-# - python3-pip
  - mariadb-server
  - mariadb-common
- #- mysql-server
  - python3-mysqldb
+ - parted
 
-#pip_pack:
-# - pymysql
-
-php_repo: ppa:ondrej/php
+php_repo_ubuntu: ppa:ondrej/php
+php_url_debian: https://packages.sury.org/php/
 
 php_pack:
  - php8.0
@@ -43,13 +40,11 @@ php_pack:
  - php8.0-pspell 
  - php8.0-xml
 
-#mysql_pack:
-# - mariadb-server
-# - mariadb-common
 
 settings_url: https://dev.1c-bitrix.ru/docs/chm_files/debian.zip
 
 dist_file: bitrix-env-crm.sh
+# dist_file: bitrix-env.sh
 
 bitrix_env_url: https://repo.bitrix.info/yum/{{ dist_file }}
 
@@ -66,3 +61,5 @@ bitrixsetup_url: https://www.1c-bitrix.ru/download/scripts/bitrixsetup.php
 mysql_db: portal
 mysql_user: bitrix
 mysql_host: localhost
+
+second_fs: ext4

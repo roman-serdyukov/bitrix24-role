@@ -18,3 +18,12 @@
     dest: "{{ dest_folder }}"
     remote_src: yes
   with_items: "{{ name_pack.files }}"
+
+- name: Preconfig packages | Disable selinux
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=disabled
+    create: yes
+  when: ansible_distribution == "Debian"

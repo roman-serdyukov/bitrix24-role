@@ -1,11 +1,33 @@
 ---
 # handlers file for bitrix24-role
 
-- name: Reboot host
+- name: Create user bitrix for CentOS
   become: true
-  ansible.builtin.reboot:
+  ansible.builtin.user:
+    name: bitrix
+  when: ansible_distribution == "CentOS"
+    
+- name: Mount for CentOS
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: /dev/vdb1 /home/bitrix {{ second_fs }} defaults 0 0
+    create: yes
+  when: ansible_distribution == "CentOS"
+
+- name: Mount for Debian family
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    line: /dev/vdb1 /var/www/html/bx-site {{ second_fs }} defaults 0 0
+    create: yes
+  when: ansible_os_family == "Debian"
 
 - name: Daemon reload
   become: true
   ansible.builtin.systemd: 
     daemon_reload: yes
+
+- name: Reboot host
+  become: true
+  ansible.builtin.reboot:
